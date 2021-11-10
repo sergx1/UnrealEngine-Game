@@ -14,6 +14,7 @@
 #include "MainPlayerController.h"
 #include "Enemy.h"
 #include "Particles/ParticleSystemComponent.h"
+#include "MySaveGame.h"
 
 // Sets default values
 AMain::AMain()
@@ -61,7 +62,7 @@ AMain::AMain()
 	MaxHealth = 100.f;
 	Health = 100.f;
 	MaxStamina = 100.f;
-	Stamina = 80.f;
+	Stamina = 100.f;
 	Exp = 0;
 	TotalExp = 0;
 	Lvl = 1;
@@ -81,6 +82,17 @@ void AMain::BeginPlay()
 
 	MainPlayerController = Cast<AMainPlayerController>(GetController());
 	LvlUpParticles->DeactivateSystem();
+
+	UWorld* World = GetWorld();
+	if (World) {
+		FString CurrentLevel = World->GetMapName();
+		CurrentLevel.RemoveFromStart(GetWorld()->StreamingLevelsPrefix);
+		FName CurrentLevelName = FName(CurrentLevel);
+		UE_LOG(LogTemp, Warning, TEXT("%s"), *CurrentLevel);
+		if (CurrentLevelName != FName(TEXT("FrozenCove"))) {
+			LoadGame();
+		}
+	}
 
 }
 
@@ -232,6 +244,7 @@ void AMain::NPressed() {
 }
 
 void AMain::IncreaseExp(int32 Amount) {
+	Amount = float(Amount) / Lvl;
 	if (Lvl >= 100) return;
 	if (Amount + Exp >= 1000) {
 		Lvl = Lvl + ((Amount + Exp) / 1000);
@@ -313,6 +326,8 @@ void AMain::Die() {
 
 void AMain::SwitchLevel(FName LevelName) {
 	UWorld* World = GetWorld();
+	SaveGame();
+	UE_LOG(LogTemp, Warning, TEXT("SaveGame()"));
 	if (World) {
 		FString CurrentLevel = World->GetMapName();
 		FName CurrentLevelName = FName(CurrentLevel);
@@ -320,4 +335,31 @@ void AMain::SwitchLevel(FName LevelName) {
 			UGameplayStatics::OpenLevel(World, LevelName);
 		}
 	}
+}
+
+void AMain::SaveGame() {
+	UMySaveGame* SaveGameInstance = Cast<UMySaveGame>(UGameplayStatics::CreateSaveGameObject(UMySaveGame::StaticClass()));
+
+	SaveGameInstance->CharacterStats.MaxHealth = MaxHealth;
+	SaveGameInstance->CharacterStats.MaxStamina = MaxStamina;
+	SaveGameInstance->CharacterStats.Exp = Exp;
+	SaveGameInstance->CharacterStats.TotalExp = TotalExp;
+	SaveGameInstance->CharacterStats.Lvl = Lvl;
+
+	UGameplayStatics::SaveGameToSlot(SaveGameInstance, SaveGameInstance->PlayerName, SaveGameInstance->UserIndex);
+
+}
+
+void AMain::LoadGame() {
+	UMySaveGame* LoadGameInstance = Cast<UMySaveGame>(UGameplayStatics::CreateSaveGameObject(UMySaveGame::StaticClass()));
+
+	LoadGameInstance = Cast<UMySaveGame>(UGameplayStatics::LoadGameFromSlot(LoadGameInstance->PlayerName, LoadGameInstance->UserIndex));
+
+	Health = LoadGameInstance->CharacterStats.MaxHealth;
+	MaxHealth = LoadGameInstance->CharacterStats.MaxHealth;
+	Stamina = LoadGameInstance->CharacterStats.MaxStamina;
+	MaxStamina = LoadGameInstance->CharacterStats.MaxStamina;
+	Exp = LoadGameInstance->CharacterStats.Exp;
+	TotalExp = LoadGameInstance->CharacterStats.TotalExp;
+	Lvl = LoadGameInstance->CharacterStats.Lvl;
 }
