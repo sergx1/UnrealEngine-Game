@@ -239,23 +239,34 @@ void AMain::LMBDown() {
 	}
 }
 
+
+	/*for debugging*/
 void AMain::NPressed() {
-	IncreaseExp(1000); // For debugging
+	if (Lvl >= 100) return;
+	LvlUp(1000);
+	TotalExp += 1000;
 }
+
+
+void AMain::LvlUp(int32 Amount) {
+	if (Lvl >= 100) return;
+	Lvl = Lvl + ((Amount + Exp) / 1000);
+	Exp = (Amount + Exp) % 1000;
+	MaxHealth += Lvl * 5;
+	Health = MaxHealth;
+	if (EquippedWeapon) {
+		Damage = Lvl * 10 + EquippedWeapon->Damage;
+	}
+	UGameplayStatics::PlaySound2D(this, LvlUpSound);
+	LvlUpParticles->ActivateSystem(true);
+}
+
 
 void AMain::IncreaseExp(int32 Amount) {
 	Amount = float(Amount) / Lvl;
 	if (Lvl >= 100) return;
 	if (Amount + Exp >= 1000) {
-		Lvl = Lvl + ((Amount + Exp) / 1000);
-		Exp = (Amount + Exp) % 1000;
-		MaxHealth += Lvl * 5;
-		Health = MaxHealth;
-		if (EquippedWeapon) {
-			Damage = Lvl * 10 + EquippedWeapon->Damage;
-		}
-		UGameplayStatics::PlaySound2D(this, LvlUpSound);
-		LvlUpParticles->ActivateSystem(true);
+		LvlUp(Amount);
 	}
 	else {
 		Exp += Amount;
