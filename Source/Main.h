@@ -126,6 +126,9 @@ public:
 
 	void LMBDown();
 
+	UPROPERTY(VisibleAnywhere, Category = "SaveGame")
+	bool SavedGame;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Death")
 	bool bLMBDown;
 
@@ -164,4 +167,10 @@ public:
 	FVector CombatTargetLocation;
 
 	void SwitchLevel(FName LevelName);
+
+	UFUNCTION(BlueprintCallable)
+	void SaveGame();
+
+	UFUNCTION(BlueprintCallable)
+	void LoadGame();
 };
