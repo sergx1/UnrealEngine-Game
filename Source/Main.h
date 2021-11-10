@@ -113,6 +113,8 @@ public:
 	void NPressed();
 
 	void IncreaseExp(int32 Amount);
+
+	void LvlUp(int32 Amount);
 	
 	void IncreaseHealth(float Amount);
 
