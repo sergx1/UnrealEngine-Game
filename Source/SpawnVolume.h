@@ -19,7 +19,7 @@ public:
 	class UBoxComponent* SpawningBox;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Spawning")
-	TSubclassOf<class ACritter> PawnToSpawn;
+	TSubclassOf<class AEnemy> PawnToSpawn;
 
 protected:
 	// Called when the game starts or when spawned
