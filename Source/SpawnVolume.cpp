@@ -5,7 +5,7 @@
 #include "Components/BoxComponent.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Engine/World.h"
-#include "Critter.h"
+#include "Enemy.h"
 
 // Sets default values
 ASpawnVolume::ASpawnVolume()
@@ -45,8 +45,8 @@ void ASpawnVolume::SpawnOurPawn_Implementation(UClass* ToSpawn, const FVector& L
 		FActorSpawnParameters SpawnParameters;
 
 		if (World) {
-			ACritter* CritterSpawned = World->SpawnActor<ACritter>(ToSpawn, Location, FRotator(0.f), SpawnParameters);
-			CritterSpawned->SetActorScale3D(2 * CritterSpawned->GetActorScale3D());
+			AEnemy* EnemySpawned = World->SpawnActor<AEnemy>(ToSpawn, Location, FRotator(0.f), SpawnParameters);
+			EnemySpawned->SetActorScale3D(2 * EnemySpawned->GetActorScale3D());
 		}
 	}
 }
