@@ -19,6 +19,7 @@ ALevelChange::ALevelChange()
 	LvlSwitchParticles->SetupAttachment(GetRootComponent());
 
 	TransitionLevelName = "FrozenCove";
+	LvlRequired = 3;
 
 }
 
@@ -43,7 +44,13 @@ void ALevelChange::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent,
 	if (OtherActor) {
 		AMain* Main = Cast<AMain>(OtherActor);
 		if (Main) {
-			Main->SwitchLevel(TransitionLevelName);
+			if (Main->Lvl >= LvlRequired) {
+				Main->SwitchLevel(TransitionLevelName);
+			}
+			else {
+				GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow, 
+					FString::Printf(TEXT("Lvl %d required to enter this level."), LvlRequired), true, FVector2D(1.8f));
+			}
 		}
 	}
 }
