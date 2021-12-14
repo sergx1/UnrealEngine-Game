@@ -20,20 +20,46 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Widgets")
 	UUserWidget* HUDOverlay;
 
-	/*
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Widgets")
-	TSubclassOf<UUserWidget> WEnemyHealthBar;
+	TSubclassOf<UUserWidget> WPauseMenu;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Widgets")
-	UUserWidget* EnemyHealthBar;
+	UUserWidget* PauseMenu;
 
-	bool bEnemyHealthBarVisible;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Widgets")
+	TSubclassOf<UUserWidget> WControls;
 
-	void DisplayEnemyHealthBar();
-	void RemoveEnemyHealthBar();
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Widgets")
+	UUserWidget* Controls;
 
-	FVector EnemyLocation;
-	*/
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Widgets")
+	class USoundCue* PauseMenuSound;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Widgets")
+	TSubclassOf<UUserWidget> WDeadMenu;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Widgets")
+	UUserWidget* DeadMenu;
+
+	bool bPauseMenuVisible;
+
+	UFUNCTION(BlueprintCallable, Category = "HUD")
+	void DisplayPauseMenu();
+
+	UFUNCTION(BlueprintCallable, Category = "HUD")
+	void RemovePauseMenu();
+
+	UFUNCTION(BlueprintCallable, Category = "HUD")
+	void RestartGame();
+
+	void TogglePauseMenu();
+
+	UFUNCTION(BlueprintCallable, Category = "HUD")
+	void DisplayControls();
+
+	void DisplayDeadMenu();
+
+	
 
 protected:
 	virtual void BeginPlay() override;
