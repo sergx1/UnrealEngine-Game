@@ -128,11 +128,17 @@ public:
 
 	void LMBDown();
 
+	void ESCUp();
+
+	void ESCDown();
+
+	bool bESCDown;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Combat")
+	bool bLMBDown;
+
 	UPROPERTY(VisibleAnywhere, Category = "SaveGame")
 	bool SavedGame;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Death")
-	bool bLMBDown;
 
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
