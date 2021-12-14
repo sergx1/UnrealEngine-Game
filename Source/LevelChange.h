@@ -21,6 +21,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "LevelSwitch")
 	FName TransitionLevelName;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "LevelSwitch")
+	int32 LvlRequired;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "LevelSwitch")
 	class UParticleSystemComponent* LvlSwitchParticles;
 
