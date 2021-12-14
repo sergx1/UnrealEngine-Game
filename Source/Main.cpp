@@ -55,9 +55,9 @@ AMain::AMain()
 	bShiftPressed = false;
 	StaminaDecreaseMultiplier = 10.f;
 
-
 	bIsDead = false;
 	bLMBDown = false;
+	bESCDown = false;
 	
 	MaxHealth = 100.f;
 	Health = 100.f;
@@ -68,7 +68,7 @@ AMain::AMain()
 	Lvl = 1;
 	Damage = 0.f;
 
-	SwitchTime = 10.f;
+	SwitchTime = 6.f;
 
 	bHasCombatTarget = false;
 
@@ -149,6 +149,10 @@ void AMain::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 	PlayerInputComponent->BindAction("LMB", IE_Pressed, this, &AMain::LMBDown);
 	PlayerInputComponent->BindAction("LMB", IE_Released, this, &AMain::LMBUp);
+
+	FInputActionBinding& Pause = PlayerInputComponent->BindAction("ESC", IE_Pressed, this, &AMain::ESCDown);
+	Pause.bExecuteWhenPaused = true;
+	PlayerInputComponent->BindAction("ESC", IE_Released, this, &AMain::ESCUp);
 
 	PlayerInputComponent->BindAction("Equip", IE_Pressed, this, &AMain::EquipItem);
 
@@ -236,6 +240,19 @@ void AMain::LMBDown() {
 	bLMBDown = true;
 	if (EquippedWeapon) {
 		Attack();
+	}
+}
+
+void AMain::ESCUp() {
+	bESCDown = false;
+}
+
+void AMain::ESCDown() {
+	StopRunning();
+	bESCDown = true;
+
+	if (MainPlayerController) {
+		MainPlayerController->TogglePauseMenu();
 	}
 }
 
@@ -333,6 +350,9 @@ void AMain::AttackEnd() {
 void AMain::Die() {
 	GetEquippedWeapon()->Destroy();
 	Destroy();
+	if (MainPlayerController) {
+		MainPlayerController->DisplayDeadMenu();
+	}
 }
 
 void AMain::SwitchLevel(FName LevelName) {
