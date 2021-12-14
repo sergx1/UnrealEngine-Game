@@ -3,6 +3,8 @@
 
 #include "MainPlayerController.h"
 #include "Blueprint/UserWidget.h"
+#include "Sound/SoundCue.h"
+#include "Kismet/GameplayStatics.h"
 
 void AMainPlayerController::BeginPlay() {
 	Super::BeginPlay();
@@ -12,40 +14,102 @@ void AMainPlayerController::BeginPlay() {
 	HUDOverlay->AddToViewport();
 	HUDOverlay->SetVisibility(ESlateVisibility::Visible);
 
-	/*if (WEnemyHealthBar) {
-		EnemyHealthBar = CreateWidget<UUserWidget>(this, WEnemyHealthBar);
-		if (EnemyHealthBar) {
-			EnemyHealthBar->AddToViewport();
-			EnemyHealthBar->SetVisibility(ESlateVisibility::Hidden);
+	if (WPauseMenu) {
+		PauseMenu = CreateWidget<UUserWidget>(this, WPauseMenu);
+		if (PauseMenu) {
+			PauseMenu->AddToViewport();
+			PauseMenu->SetVisibility(ESlateVisibility::Hidden);
 		}
-		FVector2D Vec = FVector2D(0.f, 0.f);
-		EnemyHealthBar->SetAlignmentInViewport(Vec);
-	}*/
+	}
+
+	if (WControls) {
+		Controls = CreateWidget<UUserWidget>(this, WControls);
+		if (Controls) {
+			Controls->AddToViewport();
+			Controls->SetVisibility(ESlateVisibility::Hidden);
+		}
+	}
+
+	bPauseMenuVisible = false;
+
+	if (WDeadMenu) {
+		DeadMenu = CreateWidget<UUserWidget>(this, WDeadMenu);
+		if (DeadMenu) {
+			DeadMenu->AddToViewport();
+			DeadMenu->SetVisibility(ESlateVisibility::Hidden);
+		}
+	}
+
+
 }
 
 void AMainPlayerController::Tick(float DeltaTime) {
+
 	Super::Tick(DeltaTime);
-
-	/*if (EnemyHealthBar) {
-		FVector2D PositionInViewport;
-		ProjectWorldLocationToScreen(EnemyLocation, PositionInViewport);
-		PositionInViewport.Y -= 80.f;
-		FVector2D SizeInViewport = FVector2D(250.f, 10.f);
-
-		EnemyHealthBar->SetPositionInViewport(PositionInViewport);
-		EnemyHealthBar->SetDesiredSizeInViewport(SizeInViewport);
-	}*/
 }
 
-/*void AMainPlayerController::DisplayEnemyHealthBar() {
-	if (EnemyHealthBar) {
-		bEnemyHealthBarVisible = true;
-		EnemyHealthBar->SetVisibility(ESlateVisibility::Visible);
+void AMainPlayerController::DisplayPauseMenu() {
+	if (PauseMenu) {
+		bPauseMenuVisible = true;
+		PauseMenu->SetVisibility(ESlateVisibility::Visible);
+		if (PauseMenuSound) {
+			UGameplayStatics::PlaySound2D(this, PauseMenuSound);
+		}
+
+		UGameplayStatics::SetGamePaused(GetWorld(), true);
+		FInputModeGameAndUI InputModeGameAndUI;
+		SetInputMode(InputModeGameAndUI);
+		bShowMouseCursor = true;
 	}
 }
-void AMainPlayerController::RemoveEnemyHealthBar() {
-	if (EnemyHealthBar) {
-		bEnemyHealthBarVisible = false;
-		EnemyHealthBar->SetVisibility(ESlateVisibility::Hidden);
+
+void AMainPlayerController::RemovePauseMenu() {
+	if (PauseMenu) {
+		bPauseMenuVisible = false;
+		PauseMenu->SetVisibility(ESlateVisibility::Hidden);
+		if (Controls) {
+			Controls->SetVisibility(ESlateVisibility::Hidden);
+		}
+		if (PauseMenuSound) {
+			UGameplayStatics::PlaySound2D(this, PauseMenuSound);
+		}
+
+		UGameplayStatics::SetGamePaused(GetWorld(), false);
+		FInputModeGameOnly InputModeGameOnly;
+		SetInputMode(InputModeGameOnly);
+		bShowMouseCursor = false;
 	}
-}*/
+}
+
+void AMainPlayerController::TogglePauseMenu() {
+	if(bPauseMenuVisible) {
+		RemovePauseMenu();
+	}
+	else {
+		DisplayPauseMenu();
+	}
+}
+
+void AMainPlayerController::DisplayControls() {
+	if (Controls) {
+		if (PauseMenu) {
+			PauseMenu->SetVisibility(ESlateVisibility::Hidden);
+		}
+		Controls->SetVisibility(ESlateVisibility::Visible);
+	}
+}
+
+void AMainPlayerController::DisplayDeadMenu() {
+	if (DeadMenu) {
+		DeadMenu->SetVisibility(ESlateVisibility::Visible);
+		// UGameplayStatics::SetGamePaused(GetWorld(), true);
+		FInputModeGameAndUI InputModeGameAndUI;
+		SetInputMode(InputModeGameAndUI);
+		bShowMouseCursor = true;
+	}
+}
+
+void AMainPlayerController::RestartGame() {
+	RemovePauseMenu();
+	RestartLevel();
+}
